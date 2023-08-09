@@ -1,0 +1,275 @@
+body {
+    background: #f5f5f5;
+    font-family: "proxima-nova", "Helvetica Neue", Helvetica, Arial, Sans-Serif;
+}
+
+.swal2-popup {
+    font-size: 1.6rem !important;
+}
+
+.container {
+    padding-top: 32px;
+    padding-bottom: 32px;
+}
+
+.top-logo {
+    height: 64px;
+}
+
+.top-button {
+    margin-top: 32px;
+    height: 40px;
+    font-size: 1.6rem;
+}
+
+.status-container {
+    width: 100%;
+    border-radius: 4px;
+    background: #fff;
+    color: #000;
+    margin-top: 32px;
+    margin-bottom: 32px;
+    line-height: 64px;
+    font-size: 2rem;
+    font-weight: bold;
+    padding-left: 20px;
+}
+
+.status-container .status-description {
+    background-color: #f1f1f1;
+    color: #333333;
+    font-size: 1.6rem;
+    font-weight: normal;
+    padding: 16px 20px;
+    line-height: 2.5rem;
+    margin-left: -20px;
+}
+
+.status-normal {
+    background: #2fcc66;
+    color: #ffffff;
+    border: 2px solid #2fcc66;
+}
+
+.status-error {
+    background: #ff5a5a;
+    color: #ffffff;
+    border: 2px solid #ff5a5a;
+}
+
+.status-warning {
+    background: #f7ac21;
+    color: #ffffff;
+    border: 2px solid #f7ac21;
+}
+
+.service-container {
+    padding: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.shared-partial.uptime-90-days-wrapper {
+    margin-top: 8px;
+    margin-bottom: 0px;
+}
+
+.shared-partial.uptime-90-days-wrapper svg {
+    margin: 0;
+    padding: 0;
+    height: 34px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.service-name {
+    font-size: 1.6rem;
+}
+
+.component-status {
+    font-size: 1.4rem;
+    float: right;
+    display: inline-block;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.status-text-normal {
+    color: #2fcc66;
+}
+
+.status-text-error {
+    color: #e92020;
+}
+
+.status-text-warning {
+    color: #e9a420;
+}
+
+.shared-partial.uptime-90-days-wrapper .legend {
+    display: flex;
+    display: -ms-flexbox;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.shared-partial.uptime-90-days-wrapper .legend .legend-item.light {
+    color: #333;
+    opacity: 0.5;
+    flex: 0 0 auto;
+    font-size: .875rem;
+    position: relative;
+}
+
+.shared-partial.uptime-90-days-wrapper .legend .spacer {
+    background: #333;
+    opacity: 0.3;
+    flex: 1;
+    margin: 0.75rem 1rem 0 1rem;
+    height: 1px;
+}
+
+.shared-partial.uptime-90-days-wrapper .uptime-percent, .legend-item-uptime-value {
+    color: #333;
+}
+
+.service-container>div {
+    margin-bottom: 12px;
+}
+
+.service-container>div:last-child {
+    margin-bottom: 0px;
+}
+
+.incidents-container {
+    margin-bottom: 32px;
+}
+
+.incident-item {
+    margin-top: 16px;
+    margin-bottom: 32px;
+}
+
+.incident-item:last-child {
+    margin-bottom: 0px;
+}
+
+.incident-item .incident-time {
+    font-size: 2rem;
+    color: #333;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 8px;
+}
+
+.incident-item .incident-text {
+    font-size: 1.6rem;
+    color: #333;
+}
+
+.incident-text[title] {
+    cursor: pointer;
+}
+
+.margin-top-32 {
+    margin-top: 32px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.floating-text {
+    width: 300px;
+    line-height: 2.5rem;
+    font-size: 1.6rem;
+    background-color: #f1f1f1;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 16px;
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    z-index: 999;
+    display: none;
+}
+
+.availability-time-line-graphic .uptime-day:hover {
+    fill: rgba(0, 0, 0, 0.3);
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.incident-edit, .broadcast-edit {
+    height: 256px !important;
+}
+
+.status-description p:last-child {
+    margin-bottom: 0px;
+}
+
+.separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #555;
+    margin-bottom: 16px;
+    font-size: 1.6rem;
+}
+
+.separator::before,
+.separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.separator:not(:empty)::before {
+    margin-right: .5em;
+}
+
+.separator:not(:empty)::after {
+    margin-left: .5em;
+}
+
+.no-margin {
+    margin: 0 !important;
+}
+
+.create-service small {
+    margin-top: 4px;
+    font-size: 1.4rem;
+    display: block;
+}
+
+.force-link {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+.force-link:hover {
+    color: #23527c;
+    text-decoration: underline;
+}
+
+.text-small {
+    font-size: 1.4rem;
+}
+
+.hover-text {
+    cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+    .center-on-mobile {
+        text-align: center;
+        float: none;
+    }
+}
