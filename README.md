@@ -20,7 +20,7 @@ A simple status page service, written in PHP
 cd /data/wwwroot/my-website.com/
 git clone https://github.com/kasuganosoras/TinyStat .
 ```
-2. Create a new database, using `utf8` or `utf8mb4` charset.
+2. Create a new database, using `utf8mb4` charset.
 3. Edit your config.php and change the database info.
 4. Running the following command in your terminal to initialize the database
 ```bash
