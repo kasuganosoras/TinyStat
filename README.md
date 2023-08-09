@@ -1,7 +1,7 @@
 # TinyStat
 A simple status page service, written in PHP
 
-![image](https://github.com/kasuganosoras/TinyStat/assets/34357771/3f872e1b-d2b1-4eed-8844-5f87ac3181c6)
+![image](https://github.com/kasuganosoras/TinyStat/assets/34357771/1c5b2abb-6e84-47d1-a66c-298eaf45ac27)
 
 ## Features
 * TCP/UDP/ICMP/HTTP Service support
