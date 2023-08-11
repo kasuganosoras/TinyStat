@@ -1,6 +1,8 @@
 # TinyStat
 A simple status page service, written in PHP
 
+[中文介绍](README_zh.md)
+
 ![image](https://github.com/kasuganosoras/TinyStat/assets/34357771/1c5b2abb-6e84-47d1-a66c-298eaf45ac27)
 
 ## Features
