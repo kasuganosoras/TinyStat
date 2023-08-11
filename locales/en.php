@@ -89,4 +89,15 @@ $locale['en'] = [
     'success.service.created' => 'Service created successfully',
     'success.service.updated' => 'Service updated successfully',
     'success.service.deleted' => 'Service deleted successfully',
+    // notification
+    'notify.reason.none' => 'None',
+    'notify.email.title' => 'Service [%s] status changed',
+    'notify.email.content' => '<h3>Service status changed</h3><p>Service name: %s</p><p>Current status: %s</p><p>Reason: %s</p>',
+    'notify.card.title' => 'Service status changed',
+    'notify.card.description' => 'Detected that the online status of the service has changed',
+    'notify.card.field.service' => 'Service name',
+    'notify.card.field.status' => 'Service status',
+    'notify.card.field.reason' => 'Reason',
+    'notify.dingtalk.title' => 'Service status changed',
+    'notify.dingtalk.content' => "### Service status changed\n\n**Service name**: %s\n\n**Current status**: %s\n\n**Reason**: %s",
 ];

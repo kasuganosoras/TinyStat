@@ -179,6 +179,24 @@ EOF;
                 echo "Database installed successfully.\n";
             }
             break;
+        case 'testmail':
+            echo "Input email address to send test email to: ";
+            $email = trim(fgets(STDIN));
+            SendEmail($email, 'Test Email', 'This is a test email.');
+            echo "Test email sent successfully.\n";
+            break;
+        case 'testdiscord':
+            SendDiscordCard('Test', 'Normal', 'This is a test message.');
+            echo "Test Discord message sent successfully.\n";
+            break;
+        case 'testkook':
+            SendKookCard('Test', 'Normal', 'This is a test message.');
+            echo "Test Kook message sent successfully.\n";
+            break;
+        case 'testdingtalk':
+            SendDingTalkMsg('Test', 'Normal', 'This is a test message.');
+            echo "Test DingTalk message sent successfully.\n";
+            break;
         default:
             DisplayHelp();
             break;
@@ -197,4 +215,7 @@ function DisplayHelp() {
     echo "  getconfig       Get site config\n";
     echo "  setconfig       Set site config\n";
     echo "  install         Install database\n";
+    echo "  testmail        Send test email\n";
+    echo "  testdiscord     Send test Discord message\n";
+    echo "  testkook        Send test Kook message\n";
 }

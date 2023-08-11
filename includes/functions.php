@@ -1,5 +1,93 @@
 <?php
 include(__DIR__ . "/../locales/" . LOCALE . ".php");
+include(__DIR__ . "/phpmailer.php");
+include(__DIR__ . "/smtp.php");
+include(__DIR__ . "/exception.php");
+include(__DIR__ . "/discord.php");
+include(__DIR__ . "/kook.php");
+include(__DIR__ . "/dingtalk.php");
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+
+function SendEmail($to, $subject, $content) {
+    $mail = new PHPMailer();
+    $mail->isSMTP();
+    // $mail->SMTPDebug   = SMTP::DEBUG_SERVER;
+    $mail->Host        = SMTP_HOST;
+    $mail->SMTPAuth    = true;
+    $mail->Username    = SMTP_USER;
+    $mail->Password    = SMTP_PASS;
+    $mail->SMTPSecure  = SMTP_MODE;
+    $mail->Port        = SMTP_PORT;
+    $mail->CharSet     = "UTF-8";
+    $mail->SMTPAutoTLS = false;
+    $mail->SMTPOptions = [
+        'ssl' => [
+            'verify_peer'       => SMTP_VERI,
+            'verify_peer_name'  => SMTP_VERI,
+            'verify_depth'      => 3,
+            'allow_self_signed' => !SMTP_VERI,
+        ],
+    ];
+    $mail->setFrom(SMTP_FROM);
+    $mail->addAddress($to);
+    $mail->isHTML(true);
+    $mail->Subject = $subject;
+    $mail->Body    = $content;
+    $mail->send();
+    // PrintLog($mail->ErrorInfo);
+}
+
+function SendDiscordCard($name, $status, $reason = null) {
+    $discord = new Discord(DISCORD_CHANNEL, DISCORD_TOKEN);
+    $result = $discord->sendMessage([
+        "username" => DISCORD_USERNAME,
+        "embeds" => [
+            [
+                "fields" => [
+                    [
+                        "name" => _U('notify.card.title'),
+                        "value" => _U('notify.card.description'),
+                    ],
+                    [
+                        "name" => _U('notify.card.field.service'),
+                        "value" => $name,
+                        "inline" => true,
+                    ],
+                    [
+                        "name" => _U('notify.card.field.status'),
+                        "value" => $status,
+                        "inline" => true,
+                    ],
+                    [
+                        "name" => _U('notify.card.field.reason'),
+                        "value" => $reason ?? _U('notify.reason.none'),
+                    ],
+                ],
+            ]
+        ]
+    ]);
+    // PrintLog($result);
+}
+
+function SendKookCard($name, $status, $reason = null) {
+    $kook = new Kook(KOOK_TOKEN);
+    $card = $kook->getCardMessage(_U('notify.card.title'), [
+        [_U('notify.card.field.service'), $name],
+        [_U('notify.card.field.status'), $status],
+        [_U('notify.card.field.reason'), $reason ?? _U('notify.reason.none')],
+    ], 2);
+    $result = $kook->sendGroupMsg(KOOK_CHANNEL, $card, 10);
+    // PrintLog($result);
+}
+
+function SendDingTalkMsg($name, $status, $reason = null) {
+    $dingtalk = new DingTalk(DINGTALK_TOKEN, DINGTALK_SECRET);
+    $result = $dingtalk->sendMarkdownMessage(_U('notify.dingtalk.title'), _UF('notify.dingtalk.content', $name, $status, $reason ?? _U('notify.reason.none')));
+    // PrintLog($result);
+}
+
 function IcmpPing($host) {
     $package = hex2bin("080000005243430001");
     for($i = strlen($package); $i < 64; $i++) {
@@ -66,39 +154,39 @@ function CheckHttpService($url, $status, $response, $extra) {
     error_reporting($errLvl);
     if($status && $httpCode != $status) {
         PrintLog("HTTP status code error: {$httpCode} ({$url}), expected {$status}");
-        return false;
+        return ["success" => false, "reason" => "HTTP status code error: {$httpCode}, expected {$status}"];
     }
     if(!empty($response) && strpos($result, $response) === false) {
         PrintLog("HTTP response error: {$response} ({$url}), expected {$response}");
-        return false;
+        return ["success" => false, "reason" => "HTTP response error: {$response}, expected {$response}"];
     }
-    return true;
+    return ["success" => true];
 }
 
 function CheckTcpService($host, $port) {
     $fp = @fsockopen($host, $port, $errno, $errstr, TIMEOUT_SEC);
     if(!$fp) {
-        return false;
+        return ["success" => false, "reason" => $errstr];
     }
     fclose($fp);
-    return true;
+    return ["success" => true];
 }
 
 function CheckUdpService($host, $port) {
     $fp = @fsockopen("udp://{$host}", $port, $errno, $errstr, TIMEOUT_SEC);
     if(!$fp) {
-        return false;
+        return ["success" => false, "reason" => $errstr];
     }
     fclose($fp);
-    return true;
+    return ["success" => true];
 }
 
 function CheckIcmpService($host) {
     $result = IcmpPing($host);
     if (is_string($result)) {
-        return false;
+        return ["success" => false, "reason" => $result];
     }
-    return true;
+    return ["success" => true];
 }
 
 function PrintLog() {
@@ -339,5 +427,18 @@ function _U($name) {
 
 function _UE($name) {
     $value = _U($name);
+    echo $value;
+}
+
+function _UF() {
+    $args = func_get_args();
+    $name = array_shift($args);
+    $value = _U($name);
+    return vsprintf($value, $args);
+}
+
+function _UFE() {
+    $args = func_get_args();
+    $value = call_user_func_array('_UF', $args);
     echo $value;
 }

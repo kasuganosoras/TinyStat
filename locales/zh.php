@@ -93,4 +93,15 @@ $locale['zh'] = [
     'success.service.created' => '服务创建成功',
     'success.service.updated' => '服务更新成功',
     'success.service.deleted' => '服务删除成功',
+    // notifications
+    'notify.reason.none' => '无',
+    'notify.email.title' => '服务 [%s] 状态发生变化',
+    'notify.email.content' => '<h3>服务状态发生变化</h3><p>服务名称：%s</p><p>服务状态：%s</p><p>更新原因：%s</p>',
+    'notify.card.title' => '服务状态发生变化',
+    'notify.card.description' => '检测到有服务的在线状态发生变化',
+    'notify.card.field.service' => '服务名称',
+    'notify.card.field.status' => '服务状态',
+    'notify.card.field.reason' => '更新原因',
+    'notify.dingtalk.title' => '服务状态发生变化',
+    'notify.dingtalk.content' => "### 服务状态发生变化\n\n**服务名称**：%s\n\n**当前状态**：%s\n\n**变更原因**：%s",
 ];

@@ -317,7 +317,7 @@ function EditIncident(date) {
         async: false,
         dataType: 'json',
         success: function(data) {
-            currentIncident = data.incident;
+            currentIncident = data.incident || '';
         },
         error: function() {
             Swal.fire({
