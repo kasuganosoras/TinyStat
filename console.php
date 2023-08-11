@@ -197,6 +197,10 @@ EOF;
             SendDingTalkMsg('Test', 'Normal', 'This is a test message.');
             echo "Test DingTalk message sent successfully.\n";
             break;
+        case 'testwecom':
+            SendWeComMsg('Test', 'Normal', 'This is a test message.');
+            echo "Test WeCom message sent successfully.\n";
+            break;
         default:
             DisplayHelp();
             break;
@@ -218,4 +222,6 @@ function DisplayHelp() {
     echo "  testmail        Send test email\n";
     echo "  testdiscord     Send test Discord message\n";
     echo "  testkook        Send test Kook message\n";
+    echo "  testdingtalk    Send test DingTalk message\n";
+    echo "  testwecom       Send test WeCom message\n";
 }

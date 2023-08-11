@@ -99,5 +99,6 @@ $locale['en'] = [
     'notify.card.field.status' => 'Service status',
     'notify.card.field.reason' => 'Reason',
     'notify.dingtalk.title' => 'Service status changed',
-    'notify.dingtalk.content' => "### Service status changed\n\n**Service name**: %s\n\n**Current status**: %s\n\n**Reason**: %s",
+    'notify.dingtalk.content' => '## Service status changed\n\n**Service name**: %s\n\n**Current status**: %s\n\n**Reason**: %s',
+    'notify.wecom.content' => '## Service status changed\n\n**Service name**: %s\n\n**Current status**: %s\n\n**Reason**: %s',
 ];

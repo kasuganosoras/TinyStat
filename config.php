@@ -40,3 +40,6 @@ define("KOOK_TOKEN", "xxxxx");
 /* DingTalk Configuration */
 define("DINGTALK_TOKEN", "xxxxxx");
 define("DINGTALK_SECRET", "xxxxxx");
+
+/* WeCom Configuration */
+define("WECOM_KEY", "xxxxxx");

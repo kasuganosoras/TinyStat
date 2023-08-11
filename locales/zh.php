@@ -103,5 +103,6 @@ $locale['zh'] = [
     'notify.card.field.status' => '服务状态',
     'notify.card.field.reason' => '更新原因',
     'notify.dingtalk.title' => '服务状态发生变化',
-    'notify.dingtalk.content' => "### 服务状态发生变化\n\n**服务名称**：%s\n\n**当前状态**：%s\n\n**变更原因**：%s",
+    'notify.dingtalk.content' => "## 服务状态发生变化\n\n**服务名称**：%s\n\n**当前状态**：%s\n\n**变更原因**：%s",
+    'notify.wecom.content' => "## 服务状态发生变化\n\n**服务名称**：%s\n\n**当前状态**：%s\n\n**变更原因**：%s",
 ];

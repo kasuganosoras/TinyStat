@@ -6,6 +6,7 @@ include(__DIR__ . "/exception.php");
 include(__DIR__ . "/discord.php");
 include(__DIR__ . "/kook.php");
 include(__DIR__ . "/dingtalk.php");
+include(__DIR__ . "/wecom.php");
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
@@ -86,6 +87,16 @@ function SendDingTalkMsg($name, $status, $reason = null) {
     $dingtalk = new DingTalk(DINGTALK_TOKEN, DINGTALK_SECRET);
     $result = $dingtalk->sendMarkdownMessage(_U('notify.dingtalk.title'), _UF('notify.dingtalk.content', $name, $status, $reason ?? _U('notify.reason.none')));
     // PrintLog($result);
+}
+
+function SendWeComMsg($name, $status, $reason = null) {
+    $wecom = new WeCom(WECOM_KEY);
+    $result = $wecom->sendMessage([
+        "msgtype" => "markdown",
+        "markdown" => [
+            "content" => _UF('notify.wecom.content', $name, $status, $reason ?? _U('notify.reason.none')),
+        ],
+    ]);
 }
 
 function IcmpPing($host) {
