@@ -7,7 +7,7 @@ A simple status page service, written in PHP
 * TCP/UDP/ICMP/HTTP Service support
 * Locale support
 * Incident description with markdown support
-* Email/Discord/Kook/DingTalk notification
+* Email/Discord/Kook/DingTalk/WeCom notification
 
 ## Requirements
 * PHP >= 7.0
