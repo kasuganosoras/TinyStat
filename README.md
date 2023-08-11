@@ -58,7 +58,7 @@ WantedBy=multi-user.target
 ```
 
 ## TO-DO
-- [ ] Email notification
+- [x] Email notification
 - [ ] Service display sort
 - [ ] Subscribe the status
 
