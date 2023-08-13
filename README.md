@@ -10,11 +10,13 @@ A simple status page service, written in PHP
 * Locale support
 * Incident description with markdown support
 * Email/Discord/Kook/DingTalk/WeCom notification
+* MySQL/SQLite3 support
 
 ## Requirements
 * PHP >= 7.0
 * Extension: cURL, Socket, PDO
 * MySQL / Mariadb with InnoDB support
+* SQLite3 (optional)
 * Terminal access (for cron/console)
 
 ## Installation
@@ -23,7 +25,7 @@ A simple status page service, written in PHP
 cd /data/wwwroot/my-website.com/
 git clone https://github.com/kasuganosoras/TinyStat .
 ```
-2. Create a new database, using `utf8mb4` charset.
+2. Create a new database, using `utf8mb4` charset. (Skip this step if you are using SQLite)
 3. Edit your config.php and change the database info.
 4. Running the following command in your terminal to initialize the database
 ```bash
@@ -61,7 +63,7 @@ WantedBy=multi-user.target
 
 ## TO-DO
 - [x] Email notification
-- [ ] Service display sort
+- [x] Service display sort
 - [ ] Subscribe the status
 
 ## License

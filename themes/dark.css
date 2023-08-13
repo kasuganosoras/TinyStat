@@ -77,12 +77,22 @@ body, .status-description, .floating-text {
     margin-bottom: 0px;
 }
 
+.shared-partial.uptime-90-days-wrapper .graphic-container {
+    width: 100%;
+    overflow: auto;
+}
+
 .shared-partial.uptime-90-days-wrapper svg {
     margin: 0;
     padding: 0;
     height: 34px;
     width: 100%;
-    overflow: hidden;
+    min-width: 768px;
+    /* overflow: hidden; */
+}
+
+.draggable {
+    cursor: move;
 }
 
 .service-name {
@@ -180,7 +190,7 @@ hr {
 }
 
 .floating-text {
-    width: 300px;
+    width: 400px;
     line-height: 2.5rem;
     font-size: 1.6rem;
     color: #fff;
@@ -290,5 +300,9 @@ hr {
     .center-on-mobile {
         text-align: center;
         float: none;
+    }
+    .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12 {
+        padding-left: 0;
+        padding-right: 0;
     }
 }

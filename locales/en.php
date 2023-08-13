@@ -101,4 +101,6 @@ $locale['en'] = [
     'notify.dingtalk.title' => 'Service status changed',
     'notify.dingtalk.content' => '## Service status changed\n\n**Service name**: %s\n\n**Current status**: %s\n\n**Reason**: %s',
     'notify.wecom.content' => '## Service status changed\n\n**Service name**: %s\n\n**Current status**: %s\n\n**Reason**: %s',
+    // frontend
+    'frontend.editable.title' => 'Click to edit',
 ];

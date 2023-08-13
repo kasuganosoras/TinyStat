@@ -126,7 +126,8 @@ if ($action) {
             echo "Are you sure you want to install? This will overwrite all existing data. (y/n): ";
             $confirm = trim(fgets(STDIN));
             if (strtolower($confirm) == 'y') {
-                $sqlData = <<<EOF
+                if (_E('DB_TYPE') == 'mysql') {
+                    $sqlData = <<<EOF
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 DROP TABLE IF EXISTS `config`;
@@ -153,6 +154,7 @@ CREATE TABLE `services`  (
     `status` int(5) NULL DEFAULT NULL,
     `response` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
     `extra` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
+    `sort` int(10) NULL DEFAULT NULL,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 DROP TABLE IF EXISTS `status`;
@@ -175,7 +177,52 @@ CREATE TABLE `users`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
 SET FOREIGN_KEY_CHECKS = 1;
 EOF;
-                $stmt = $pdo->query($sqlData);
+                    $pdo->exec($sqlData);
+                } else {
+                    $sqlData = <<<EOF
+DROP TABLE IF EXISTS `config`;
+CREATE TABLE `config` (
+    `key` TEXT NOT NULL,
+    `value` TEXT NULL DEFAULT NULL
+);
+DROP TABLE IF EXISTS `incidents`;
+CREATE TABLE `incidents` (
+    `date` TEXT NOT NULL,
+    `incident` TEXT NULL DEFAULT NULL,
+    `user` TEXT NULL DEFAULT NULL
+);
+DROP TABLE IF EXISTS `services`;
+CREATE TABLE `services` (
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    `name` TEXT NOT NULL,
+    `type` TEXT NOT NULL,
+    `host` TEXT NOT NULL,
+    `port` INTEGER NULL DEFAULT NULL,
+    `failure` INTEGER NULL DEFAULT NULL,
+    `status` INTEGER NULL DEFAULT NULL,
+    `response` TEXT NULL DEFAULT NULL,
+    `extra` TEXT NULL DEFAULT NULL,
+    `sort` INTEGER NULL DEFAULT NULL
+);
+DROP TABLE IF EXISTS `status`;
+CREATE TABLE `status` (
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    `service` INTEGER NOT NULL,
+    `date` TEXT NULL DEFAULT NULL,
+    `status` TEXT NULL DEFAULT NULL,
+    `incident` TEXT NULL DEFAULT NULL
+);
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    `username` TEXT NOT NULL,
+    `password` TEXT NOT NULL,
+    `email` TEXT NOT NULL,
+    `salt` TEXT NULL DEFAULT NULL
+);
+EOF;
+                    $pdo->exec($sqlData);
+                }
                 echo "Database installed successfully.\n";
             }
             break;

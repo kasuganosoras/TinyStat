@@ -46,9 +46,9 @@ function CheckServices() {
         } else {
             $stmt = $pdo->prepare('UPDATE `services` SET `failure` = `failure` + 1 WHERE `id` = ?');
             $stmt->execute([$service['id']]);
-            if ($service['failure'] >= ERR_FAILURE) {
+            if ($service['failure'] >= _E('ERR_FAILURE')) {
                 UpdateServiceStatus($service['id'], 'error', $result['reason']);
-            } elseif ($service['failure'] >= WARN_FAILURE) {
+            } elseif ($service['failure'] >= _E('WARN_FAILURE')) {
                 UpdateServiceStatus($service['id'], 'warning', $result['reason']);
             }
         }
@@ -64,7 +64,7 @@ function UpdateServiceStatus($id, $status, $reason = null) {
         $stmt = $pdo->prepare('INSERT INTO `status` (`service`, `date`, `status`, `incident`) VALUES (?, ?, ?, ?)');
         $stmt->execute([$id, date('Y.m.d'), $status, $reason]);
     } else {
-        if ($result['status'] == 'normal' || $status == 'normal' || ($result['status'] == 'warning' && $status == 'error')) {
+        /* if ($result['status'] == 'normal' || $status == 'normal' || ($result['status'] == 'warning' && $status == 'error')) {
             if ($reason) {
                 $stmt = $pdo->prepare('UPDATE `status` SET `status` = ?, `incident` = ? WHERE `id` = ?');
                 $stmt->execute([$status, $reason, $result['id']]);
@@ -75,6 +75,27 @@ function UpdateServiceStatus($id, $status, $reason = null) {
             if ($status !== $result['status']) {
                 SendNotification($id, $status, $reason);
             }
+        } */
+        // 服务状态发生变化时，更新状态和异常记录
+        if ($result['status'] !== $status) {
+            $incidents = json_decode($result['incident'], true) ?: [];
+            // 判断有无异常的 end 为空，如果有则更新 end 为当前时间
+            foreach($incidents as $key => $incident) {
+                if ($incident['end'] === null) {
+                    $incidents[$key]['end'] = time();
+                    break;
+                }
+            }
+            // 新增一条异常记录
+            $incidents[] = [
+                'start'  => time(),
+                'end'    => null,
+                'status' => $status,
+                'reason' => $reason
+            ];
+            $stmt = $pdo->prepare('UPDATE `status` SET `status` = ?, `incident` = ? WHERE `id` = ?');
+            $stmt->execute([$status, json_encode($incidents), $result['id']]);
+            SendNotification($id, $status, $reason);
         }
     }
 }
@@ -91,19 +112,22 @@ function SendNotification($id, $status, $reason = null) {
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     foreach($users as $user) {
-        if ($user['email'] && NOTIFY_EMAIL) {
+        if ($user['email'] && _E('NOTIFY_EMAIL')) {
             SendEmail($user['email'], _UF('notify.email.title', $service['name']), GetMailTemplate($service['name'], $status, $reason));
         }
     }
     $statusText = _U("status.label.{$status}");
-    if (NOTIFY_DISCORD) {
+    if (_E('NOTIFY_DISCORD')) {
         SendDiscordCard($service['name'], $statusText, $reason);
     }
-    if (NOTIFY_KOOK) {
+    if (_E('NOTIFY_KOOK')) {
         SendKookCard($service['name'], $statusText, $reason);
     }
-    if (NOTIFY_DINGTALK) {
+    if (_E('NOTIFY_DINGTALK')) {
         SendDingTalkMsg($service['name'], $statusText, $reason);
+    }
+    if (_E('NOTIFY_WECOM')) {
+        SendWeComMsg($service['name'], $statusText, $reason);
     }
 }
 
@@ -119,5 +143,5 @@ if (PHP_SAPI !== 'cli') {
 
 while (true) {
     CheckServices();
-    sleep(CHECK_INTERVAL);
+    sleep(_E('CHECK_INTERVAL'));
 }

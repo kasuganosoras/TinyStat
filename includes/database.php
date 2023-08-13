@@ -18,8 +18,14 @@ class Database {
 
     protected static function initConnection() {
         try {
-            $dsn = sprintf("mysql:host=%s;dbname=%s;charset=utf8mb4", DB_HOST, DB_NAME);
-            self::$conn = new PDO($dsn, DB_USER, DB_PASS);
+            if (_E('DB_TYPE') == 'sqlite') {
+                $fileName = __DIR__ . "/../" . _E('DB_NAME');
+                self::$conn = new PDO("sqlite:" . $fileName);
+                self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                return;
+            }
+            $dsn = sprintf("mysql:host=%s;dbname=%s;charset=utf8mb4", _E('DB_HOST'), _E('DB_NAME'));
+            self::$conn = new PDO($dsn, _E('DB_USER'), _E('DB_PASS'));
             self::$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             throw new Exception("Failed to connect to database: " . $e->getMessage());

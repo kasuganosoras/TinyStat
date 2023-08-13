@@ -1,9 +1,10 @@
 <?php
 /* Database Configuration */
-define("DB_HOST", "127.0.0.1");       // Database host
+define("DB_TYPE", "mysql");           // Database type (mysql or sqlite)
+define("DB_HOST", "127.0.0.1");       // Database host (ignored if using sqlite)
 define("DB_USER", "root");            // Database username
 define("DB_PASS", "123456");          // Database password
-define("DB_NAME", "tinystat");        // Database name
+define("DB_NAME", "tinystat");        // Database name (for sqlite, this is the absolute path to the database file)
 
 /* General Configuration */
 define("LOCALE", "en");               // Language, en or zh
@@ -27,6 +28,7 @@ define("NOTIFY_EMAIL", false);    // Send notification email
 define("NOTIFY_KOOK", false);     // Send notification to Kook channel
 define("NOTIFY_DISCORD", false);  // Send notification to Discord webhook
 define("NOTIFY_DINGTALK", false); // Send notification to DingTalk webhook
+define("NOTIFY_WECOM", false);    // Send notification to WeCom webhook
 
 /* Discord Webhook Configuration */
 define("DISCORD_CHANNEL", "xxxxx");

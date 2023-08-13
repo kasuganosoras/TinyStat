@@ -18,6 +18,7 @@ if (isset($_GET['action']) && is_string($_GET['action'])) {
             foreach ($services as $service) {
                 $logs[$service['id']] = [
                     'name' => $service['name'],
+                    'sort' => $service['sort'],
                     'data' => []
                 ];
             }
@@ -30,7 +31,7 @@ if (isset($_GET['action']) && is_string($_GET['action'])) {
                     $logs[$row['service']]['data'][] = [
                         'status' => $row['status'],
                         'date' => $row['date'],
-                        'incident' => $row['incident']
+                        'incident' => json_decode($row['incident'], true) ?: []
                     ];
                 }
             }
@@ -271,6 +272,67 @@ if (isset($_GET['action']) && is_string($_GET['action'])) {
                 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
             }
             break;
+        case 'sortService':
+            if (isset($_SESSION['user'])) {
+                if (isset($_POST['data'])) {
+                    $sorts = json_decode($_POST['data'], true);
+                    for($i = 0; $i < count($sorts); $i++) {
+                        $stmt = $pdo->prepare('UPDATE `services` SET `sort` = ? WHERE `id` = ?');
+                        $stmt->execute([$i, $sorts[$i]]);
+                    }
+                    Header("Content-Type: application/json");
+                    echo json_encode([
+                        'code' => 200,
+                        'message' => 'OK'
+                    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                } else {
+                    Header("Content-Type: application/json");
+                    echo json_encode([
+                        'code' => 400,
+                        'message' => 'Bad Request'
+                    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                }
+            } else {
+                Header("Content-Type: application/json");
+                echo json_encode([
+                    'code' => 403,
+                    'message' => 'Forbidden'
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+            break;
+        case 'editConfig':
+            if (isset($_SESSION['user'])) {
+                if (isset($_POST['name'], $_POST['data']) && preg_match('/^[a-zA-Z0-9_]+$/', $_POST['name'])) {
+                    $stmt = $pdo->prepare('SELECT * FROM `config` WHERE `key` = ?');
+                    $stmt->execute([$_POST['name']]);
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($result !== false) {
+                        $stmt = $pdo->prepare('UPDATE `config` SET `value` = ? WHERE `key` = ?');
+                        $stmt->execute([$_POST['data'], $_POST['name']]);
+                    } else {
+                        $stmt = $pdo->prepare('INSERT INTO `config` (`key`, `value`) VALUES (?, ?)');
+                        $stmt->execute([$_POST['name'], $_POST['data']]);
+                    }
+                    Header("Content-Type: application/json");
+                    echo json_encode([
+                        'code' => 200,
+                        'message' => 'OK'
+                    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                } else {
+                    Header("Content-Type: application/json");
+                    echo json_encode([
+                        'code' => 400,
+                        'message' => 'Bad Request'
+                    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                }
+            } else {
+                Header("Content-Type: application/json");
+                echo json_encode([
+                    'code' => 403,
+                    'message' => 'Forbidden'
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+            break;
         case 'login':
             if (isset($_POST['username'], $_POST['password'])) {
                 $username = $_POST['username'];
@@ -322,11 +384,11 @@ if (isset($_GET['action']) && is_string($_GET['action'])) {
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=1024, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php _CE('site_title', _U('default.title')); ?> - <?php _CE('site_description', _U('default.description')); ?></title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/font-awesome/css/all.css">
-    <link rel="stylesheet" href="themes/<?php echo THEME; ?>.css">
+    <link rel="stylesheet" href="themes/<?php echo _E('THEME'); ?>.css">
     <link rel="shortcut icon" href="themes/favicon.ico">
 </head>
 
@@ -336,8 +398,8 @@ if (isset($_GET['action']) && is_string($_GET['action'])) {
         <div class="col-sm-1"></div>
         <div class="col-sm-10">
             <div class="col-sm-8">
-                <h1><?php _CE('site_title', _U('default.title')); ?></h1>
-                <h4><?php _CE('site_description', _U('default.description')); ?></h4>
+                <h1 class="editable" data-name="site_title"><?php _CE('site_title', _U('default.title')); ?></h1>
+                <h4 class="editable" data-name="site_description"><?php _CE('site_description', _U('default.description')); ?></h4>
             </div>
             <div class="col-sm-4 text-right">
                 <button class="btn btn-primary btn-block top-button" onclick="RefreshData();"><i class="fas fa-sync-alt"></i>&nbsp;&nbsp;<?php _UE('button.refresh'); ?></button>
@@ -391,6 +453,8 @@ if (isset($_GET['action']) && is_string($_GET['action'])) {
 <script src="js/jquery.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/sweetalert2.all.min.js"></script>
+<script src="js/Sortable.min.js"></script>
+<script src="js/jquery-sortable.js"></script>
 <script src="js/main.js.php"></script>
 
 </html>

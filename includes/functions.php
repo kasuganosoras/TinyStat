@@ -15,23 +15,23 @@ function SendEmail($to, $subject, $content) {
     $mail = new PHPMailer();
     $mail->isSMTP();
     // $mail->SMTPDebug   = SMTP::DEBUG_SERVER;
-    $mail->Host        = SMTP_HOST;
+    $mail->Host        = _E('SMTP_HOST');
     $mail->SMTPAuth    = true;
-    $mail->Username    = SMTP_USER;
-    $mail->Password    = SMTP_PASS;
-    $mail->SMTPSecure  = SMTP_MODE;
-    $mail->Port        = SMTP_PORT;
+    $mail->Username    = _E('SMTP_USER');
+    $mail->Password    = _E('SMTP_PASS');
+    $mail->SMTPSecure  = _E('SMTP_MODE');
+    $mail->Port        = _E('SMTP_PORT');
     $mail->CharSet     = "UTF-8";
     $mail->SMTPAutoTLS = false;
     $mail->SMTPOptions = [
         'ssl' => [
-            'verify_peer'       => SMTP_VERI,
-            'verify_peer_name'  => SMTP_VERI,
+            'verify_peer'       => _E('SMTP_VERI'),
+            'verify_peer_name'  => _E('SMTP_VERI'),
             'verify_depth'      => 3,
-            'allow_self_signed' => !SMTP_VERI,
+            'allow_self_signed' => !_E('SMTP_VERI'),
         ],
     ];
-    $mail->setFrom(SMTP_FROM);
+    $mail->setFrom(_E('SMTP_FROM'));
     $mail->addAddress($to);
     $mail->isHTML(true);
     $mail->Subject = $subject;
@@ -41,9 +41,9 @@ function SendEmail($to, $subject, $content) {
 }
 
 function SendDiscordCard($name, $status, $reason = null) {
-    $discord = new Discord(DISCORD_CHANNEL, DISCORD_TOKEN);
+    $discord = new Discord(_E('DISCORD_CHANNEL'), _E('DISCORD_TOKEN'));
     $result = $discord->sendMessage([
-        "username" => DISCORD_USERNAME,
+        "username" => _E('DISCORD_USERNAME'),
         "embeds" => [
             [
                 "fields" => [
@@ -73,24 +73,24 @@ function SendDiscordCard($name, $status, $reason = null) {
 }
 
 function SendKookCard($name, $status, $reason = null) {
-    $kook = new Kook(KOOK_TOKEN);
+    $kook = new Kook(_E('KOOK_TOKEN'));
     $card = $kook->getCardMessage(_U('notify.card.title'), [
         [_U('notify.card.field.service'), $name],
         [_U('notify.card.field.status'), $status],
         [_U('notify.card.field.reason'), $reason ?? _U('notify.reason.none')],
     ], 2);
-    $result = $kook->sendGroupMsg(KOOK_CHANNEL, $card, 10);
+    $result = $kook->sendGroupMsg(_E('KOOK_CHANNEL'), $card, 10);
     // PrintLog($result);
 }
 
 function SendDingTalkMsg($name, $status, $reason = null) {
-    $dingtalk = new DingTalk(DINGTALK_TOKEN, DINGTALK_SECRET);
+    $dingtalk = new DingTalk(_E('DINGTALK_TOKEN'), _E('DINGTALK_SECRET'));
     $result = $dingtalk->sendMarkdownMessage(_U('notify.dingtalk.title'), _UF('notify.dingtalk.content', $name, $status, $reason ?? _U('notify.reason.none')));
     // PrintLog($result);
 }
 
 function SendWeComMsg($name, $status, $reason = null) {
-    $wecom = new WeCom(WECOM_KEY);
+    $wecom = new WeCom(_E('WECOM_KEY'));
     $result = $wecom->sendMessage([
         "msgtype" => "markdown",
         "markdown" => [
@@ -152,8 +152,8 @@ function CheckHttpService($url, $status, $response, $extra) {
     $curl = curl_init();
     curl_setopt($curl, CURLOPT_URL, $url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, TIMEOUT_SEC);
-    curl_setopt($curl, CURLOPT_TIMEOUT, TIMEOUT_SEC);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, _E('TIMEOUT_SEC'));
+    curl_setopt($curl, CURLOPT_TIMEOUT, _E('TIMEOUT_SEC'));
     curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $extra['ssl_verify'] ?? false);
     curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, $extra['ssl_verify'] ? 2 : 0);
     curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $extra['method'] ?? 'GET');
@@ -175,7 +175,7 @@ function CheckHttpService($url, $status, $response, $extra) {
 }
 
 function CheckTcpService($host, $port) {
-    $fp = @fsockopen($host, $port, $errno, $errstr, TIMEOUT_SEC);
+    $fp = @fsockopen($host, $port, $errno, $errstr, _E('TIMEOUT_SEC'));
     if(!$fp) {
         return ["success" => false, "reason" => $errstr];
     }
@@ -184,7 +184,7 @@ function CheckTcpService($host, $port) {
 }
 
 function CheckUdpService($host, $port) {
-    $fp = @fsockopen("udp://{$host}", $port, $errno, $errstr, TIMEOUT_SEC);
+    $fp = @fsockopen("udp://{$host}", $port, $errno, $errstr, _E('TIMEOUT_SEC'));
     if(!$fp) {
         return ["success" => false, "reason" => $errstr];
     }
@@ -250,7 +250,7 @@ function GetServices() {
     $services = [];
     foreach($result as $row) {
         $row['extra'] = json_decode($row['extra'], true) ?: [];
-        $services[$row['id']] = $row;
+        $services[] = $row;
     }
     return $services;
 }
@@ -433,7 +433,7 @@ function _CE($key, $default = null) {
 
 function _U($name) {
     global $locale;
-    return $locale[LOCALE][$name] ?? $name;
+    return $locale[_E('LOCALE')][$name] ?? $name;
 }
 
 function _UE($name) {
@@ -452,4 +452,12 @@ function _UFE() {
     $args = func_get_args();
     $value = call_user_func_array('_UF', $args);
     echo $value;
+}
+
+function _E($key) {
+    if (isset($_ENV[$key])) {
+        return $_ENV[$key];
+    } else {
+        return getenv($key) ?: constant($key);
+    }
 }

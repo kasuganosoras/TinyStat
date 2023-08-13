@@ -107,6 +107,51 @@ var serviceEdit = `<div class="row text-left no-margin create-service">
     </div>
 </div>`;
 
+function ConvertTimestamp(timestamp) {
+    // Convert to HH:MM:SS
+    var date = new Date(timestamp * 1000);
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    var seconds = date.getSeconds();
+    if (hours < 10) {
+        hours = '0' + hours.toString();
+    }
+    if (minutes < 10) {
+        minutes = '0' + minutes.toString();
+    }
+    if (seconds < 10) {
+        seconds = '0' + seconds.toString();
+    }
+    return hours + ':' + minutes + ':' + seconds;
+}
+
+// 数组求平均值
+function AverageArray(array) {
+    var sum = 0;
+    for (var i = 0; i < array.length; i++) {
+        sum += parseFloat(array[i]);
+    }
+    return sum / array.length;
+}
+
+// 根据百分比获取颜色，数值越高越接近绿色
+function GetColorByPercent(percent) {
+    var r = 61;
+    var g = 243;
+    var b = 61;
+    if (percent >= 75) {
+        r = 243 - ((percent - 75) / 25) * 182;
+    } else if (percent >= 50) {
+        r = 243;
+        g = 61 + ((percent - 50) / 25) * 182;
+    } else {
+        r = 243;
+        g = 61;
+    }
+    return 'rgb(' + r.toFixed(0) + ',' + g.toFixed(0) + ',' + b.toFixed(0) + ')';
+}
+
+
 function CreateChart(id, name, data) {
     var statusColorList = {
         normal: "#2fcc66",
@@ -135,30 +180,68 @@ function CreateChart(id, name, data) {
         chartSvgHtml += `<rect height="34" width="3" x="${padding * 5}" y="0" fill="#cccccc" class="uptime-day uptime-no-data day-${i}" data-date="${date}" data-incident="<?php _UE('chart.no.data'); ?>" tabindex="0"></rect>`;
         padding++;
     }
+    var timeList = [];
     for (var i = 0; i < data.length; i++) {
         var day = data[i] || {
             status: 'unknown'
         };
+        var dayIncident = '';
+        var incidentTime = 0;
+        var onlinePercent = 100;
+        if (day.incident && day.incident.length > 0) {
+            for (var j = 0; j < day.incident.length; j++) {
+                var incident = day.incident[j];
+                var statusTextIncident = statusTextList[incident.status];
+                dayIncident += '<b>' + ConvertTimestamp(incident.start) + '</b> ' + statusTextIncident;
+                if (incident.reason) {
+                    dayIncident += ' | ' + incident.reason;
+                }
+                if (j < day.incident.length - 1) {
+                    dayIncident += '<br>';
+                }
+                if (incident.status != 'normal') {
+                    if (incident.end) {
+                        incidentTime += incident.end - incident.start;
+                    } else {
+                        incidentTime += ((new Date(day.date)) / 1000) + 86400 - incident.start;
+                    }
+                }
+            }
+            if (incidentTime > 0) {
+                var calc = incidentTime / 86400 * 100;
+                console.log();
+                timeList.push(100 - calc);
+                onlinePercent = 100 - calc;
+            } else {
+                timeList.push(100);
+                onlinePercent = 100;
+            }
+        } else {
+            dayIncident = '<?php _UE('chart.no.incident'); ?>';
+            timeList.push(100);
+            onlinePercent = 100;
+        }
+        dayIncident = encodeURIComponent(dayIncident);
         var dayStatus = day.status;
-        var dayIncident = day.incident || '<?php _UE('chart.no.incident'); ?>';
-        var dayStatusColor = statusColorList[dayStatus];
-        chartSvgHtml += `<rect height="34" width="3" x="${padding * 5}" y="0" fill="${dayStatusColor}" data-date="${day.date}" data-incident="${dayIncident}" class="uptime-day day-${i}"></rect>`;
+        var dayStatusColor = GetColorByPercent(timeList[i]);
+        chartSvgHtml += `<rect height="34" width="3" x="${padding * 5}" y="0" fill="${dayStatusColor}" data-online-percent="${onlinePercent}" data-date="${day.date}" data-incident="${dayIncident}" class="uptime-day day-${i}"></rect>`;
         currentStatus = dayStatus;
-        statusPercentList[dayStatus]++;
         padding++;
     }
     var statusColor = statusColorList[currentStatus];
     var statusText = statusTextList[currentStatus];
-    var statusPercent = (statusPercentList.normal / data.length * 100).toFixed(1);
-    var chartHtml = `<div id="service-${id}">
-        <span class="service-name">
+    var statusPercent = AverageArray(timeList).toFixed(1);
+    var chartHtml = `<div id="service-${id}" data-id="${id}">
+        <span class="service-name draggable">
             <span>${name}</span>&nbsp;&nbsp;
             <?php echo isset($_SESSION['user']) ? '<span title="' . _U('chart.edit.service') . '" class="force-link text-small hover-text" onclick="EditService(${id});"><i class="fas fa-edit"></i></span>&nbsp;' : ''; ?>
             <?php echo isset($_SESSION['user']) ? '<span title="' . _U('chart.delete.service') . '" class="force-link text-small hover-text" onclick="DeleteService(${id});"><i class="fas fa-trash"></i></span>' : ''; ?>
         </span>
         <span class="component-status status-text-${currentStatus}">${statusText}</span>
         <div class="shared-partial uptime-90-days-wrapper">
-            <svg class="availability-time-line-graphic" preserveAspectRatio="none" height="34" tabindex="0" viewBox="0 0 448 34">${chartSvgHtml}</svg>
+            <div class="graphic-container">
+                <svg class="availability-time-line-graphic" preserveAspectRatio="none" height="34" tabindex="0" viewBox="0 0 448 34">${chartSvgHtml}</svg>
+            </div>
             <div class="legend legend-group">
                 <div class="legend-item light legend-item-date-range">
                     <span class="availability-time-line-legend-day-count">90</span> <?php _UE('chart.days.ago'); ?>
@@ -183,11 +266,18 @@ function CreateChart(id, name, data) {
         tmpStatus = 'error';
     }
     $(`#service-${id}`).remove();
+    // scroll to right
+    setTimeout(function() {
+        $(`#service-${id} .graphic-container`).scrollLeft(999999);
+    }, 100);
     $(".service-container").append(chartHtml);
     $(".uptime-day").on('mouseover', function() {
         var date = $(this).data('date');
         var incident = $(this).data('incident');
-        $(".floating-text").html(`<b>${date}</b><br><span>${incident}</span>`);
+        incident = decodeURIComponent(incident);
+        var onlinePercent = $(this).data('online-percent') || 100;
+        onlinePercent = onlinePercent.toFixed(1);
+        $(".floating-text").html(`<b>${date}</b> | ${onlinePercent}%<br><span>${incident}</span>`);
         $(".floating-text").show();
         var x = $(this).offset().left;
         var y = $(this).offset().top;
@@ -247,11 +337,26 @@ function RefreshData() {
         success: function(data) {
             var services = data;
             tmpStatus = 'normal';
+            var tempArray = [];
             for (var id in services) {
                 var service = services[id];
                 var name = service.name;
                 var data = service.data;
-                CreateChart(id, name, data);
+                var sort = service.sort;
+                // CreateChart(id, name, data);
+                tempArray.push({
+                    id: id,
+                    name: name,
+                    data: data,
+                    sort: sort
+                });
+            }
+            tempArray.sort(function(a, b) {
+                return a.sort - b.sort;
+            });
+            for (var i = 0; i < tempArray.length; i++) {
+                var service = tempArray[i];
+                CreateChart(service.id, service.name, service.data);
             }
             if (tmpStatus == 'normal') {
                 UpdateGlobalStatus('normal');
@@ -362,7 +467,7 @@ function EditIncident(date) {
         },
         allowOutsideClick: false
     }).then(function() {
-        window.location.reload();
+        RefreshData();
     }).catch(function(error) {
         Swal.fire({
             title: '<?php _UE('alert.error'); ?>',
@@ -487,7 +592,7 @@ function CreateService() {
         },
         allowOutsideClick: false
     }).then(function() {
-        window.location.reload();
+        RefreshData();
     }).catch(function(error) {
         Swal.fire({
             title: '<?php _UE('alert.error'); ?>',
@@ -593,7 +698,7 @@ function EditService(id) {
         },
         allowOutsideClick: false
     }).then(function() {
-        window.location.reload();
+        RefreshData();
     }).catch(function(error) {
         Swal.fire({
             title: '<?php _UE('alert.error'); ?>',
@@ -645,7 +750,7 @@ function DeleteService(id) {
         },
         allowOutsideClick: false
     }).then(function() {
-        window.location.reload();
+        RefreshData();
     }).catch(function(error) {
         Swal.fire({
             title: '<?php _UE('alert.error'); ?>',
@@ -743,7 +848,105 @@ function Logout() {
     });
 }
 
+function EditHook() {
+    // Make the element editable
+    if (isLogged) {
+        $(".editable").attr('title', '<?php _UE('frontend.editable.title'); ?>');
+        $(".editable").click(function() {
+            $(this).attr("contenteditable", "true");
+            $(this).focus();
+        });
+        // Save the element on pressing enter or on focusout
+        $(".editable").keypress(function(e) {
+            if (e.which == 13) {
+                e.preventDefault();
+                $(this).blur();
+            }
+        });
+        $(".editable").focusout(function() {
+            $(this).removeAttr("contenteditable");
+            var data = $(this).text();
+            var name = $(this).attr("data-name");
+            $.ajax({
+                url: '?action=editConfig',
+                type: 'POST',
+                data: {
+                    name: name,
+                    data: data
+                },
+                dataType: 'json',
+                success: function(data) {
+                    if (data.code != 200) {
+                        Swal.fire({
+                            title: '<?php _UE('alert.error'); ?>',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: '<?php _UE('alert.confirm'); ?>'
+                        }).then(function() {
+                            window.location.reload();
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        title: '<?php _UE('alert.error'); ?>',
+                        text: '<?php _UE('alert.error.network'); ?>',
+                        icon: 'error',
+                        confirmButtonText: '<?php _UE('alert.confirm'); ?>'
+                    }).then(function() {
+                        window.location.reload();
+                    });
+                }
+            });
+        });
+        // only on PC
+        if (document.body.clientWidth > 768) {
+            // drag to change the sort
+            $(".service-container").sortable({
+                onSort: function(e) {
+                    var elements = $(".service-container").children();
+                    var data = [];
+                    for (var i = 0; i < elements.length; i++) {
+                        data.push($(elements[i]).attr("data-id"));
+                    }
+                    $.ajax({
+                        url: '?action=sortService',
+                        type: 'POST',
+                        data: {
+                            data: JSON.stringify(data)
+                        },
+                        dataType: 'json',
+                        success: function(data) {
+                            if (data.code != 200) {
+                                Swal.fire({
+                                    title: '<?php _UE('alert.error'); ?>',
+                                    text: data.message,
+                                    icon: 'error',
+                                    confirmButtonText: '<?php _UE('alert.confirm'); ?>'
+                                }).then(function() {
+                                    window.location.reload();
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: '<?php _UE('alert.error'); ?>',
+                                text: '<?php _UE('alert.error.network'); ?>',
+                                icon: 'error',
+                                confirmButtonText: '<?php _UE('alert.confirm'); ?>'
+                            }).then(function() {
+                                window.location.reload();
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+}
+
 $(document).ready(function() {
     RefreshData();
+    EditHook();
     setInterval(RefreshData, 30000);
 });
