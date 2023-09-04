@@ -444,7 +444,7 @@ if (isset($_GET['action']) && is_string($_GET['action'])) {
                     ?>
                 </div>
                 <div class="float-right center-on-mobile">
-                    Powered by <a href="https://github.com/kasuganosoras/TinyStat" target="_blank">TinyStat</a>&nbsp;&nbsp;|&nbsp;&nbsp;Make with <i class="fas fa-heart status-text-error"></i>
+                    Powered by <a href="https://github.com/kasuganosoras/TinyStat" target="_blank">TinyStat</a>&nbsp;&nbsp;|&nbsp;&nbsp;Made with <i class="fas fa-heart status-text-error"></i>
                 </div>
             </div>
         </div>
