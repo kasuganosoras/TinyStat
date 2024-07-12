@@ -10,9 +10,11 @@ class FreeMobile {
     }
 
     public function sendMessage($message) {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, "https://smsapi.free-mobile.fr/sendmsg?user=" . $this->user . "&pass=" . $this->pass . "&msg=" . $message);
+        //encode message to %20
+        $message = urlencode($message);
+        $curl = curl_init('https://smsapi.free-mobile.fr/sendmsg?user=' . $this->user . '&pass=' . $this->pass . '&msg=' . $message);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        return curl_exec($curl);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+		return curl_exec($curl);
     }
 }
