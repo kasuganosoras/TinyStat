@@ -249,6 +249,9 @@ EOF;
             echo "Test WeCom message sent successfully.\n";
             break;
         case 'testfreemobile':
+            SendFreeMobileMsg('Test', 'Normal', 'This is a test message.');
+            echo "Test FreeMobile message sent successfully.\n";
+            break;
         default:
             DisplayHelp();
             break;
