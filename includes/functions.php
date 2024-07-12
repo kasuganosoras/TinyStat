@@ -4,6 +4,7 @@ include(__DIR__ . "/phpmailer.php");
 include(__DIR__ . "/smtp.php");
 include(__DIR__ . "/exception.php");
 include(__DIR__ . "/discord.php");
+include(__DIR__ . "/freemobile.php");
 include(__DIR__ . "/kook.php");
 include(__DIR__ . "/dingtalk.php");
 include(__DIR__ . "/wecom.php");
@@ -70,6 +71,11 @@ function SendDiscordCard($name, $status, $reason = null) {
         ]
     ]);
     // PrintLog($result);
+}
+
+function sendFreeMobileMsg($name, $status, $reason = null) {
+    $freeMobile = new FreeMobile(_E('FREEMOBILE_USER'), _E('FREEMOBILE_PASS'));
+    $result = $freeMobile->sendMessage(_UF('notify.freemobile.content', $name, $status, $reason ?? _U('notify.reason.none')));
 }
 
 function SendKookCard($name, $status, $reason = null) {
