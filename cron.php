@@ -129,6 +129,9 @@ function SendNotification($id, $status, $reason = null) {
     if (_E('NOTIFY_WECOM')) {
         SendWeComMsg($service['name'], $statusText, $reason);
     }
+    if (_E('NOTIFY_FREEMOBILE')) {
+        SendFreeMobileMsg($service['name'], $statusText, $reason);
+    }
 }
 
 function GetMailTemplate($name, $status, $reason) {

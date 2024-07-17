@@ -45,3 +45,7 @@ define("DINGTALK_SECRET", "xxxxxx");
 
 /* WeCom Configuration */
 define("WECOM_KEY", "xxxxxx");
+
+/* FreeMobile Configuration */
+define("FREEMOBILE_USER", "xxxxx");
+define("FREEMOBILE_PASS", "xxxxx");

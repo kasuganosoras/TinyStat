@@ -248,6 +248,10 @@ EOF;
             SendWeComMsg('Test', 'Normal', 'This is a test message.');
             echo "Test WeCom message sent successfully.\n";
             break;
+        case 'testfreemobile':
+            SendFreeMobileMsg('Test', 'Normal', 'This is a test message.');
+            echo "Test FreeMobile message sent successfully.\n";
+            break;
         default:
             DisplayHelp();
             break;
@@ -271,4 +275,5 @@ function DisplayHelp() {
     echo "  testkook        Send test Kook message\n";
     echo "  testdingtalk    Send test DingTalk message\n";
     echo "  testwecom       Send test WeCom message\n";
+    echo "  testfreemobile  Send test FreeMobile message\n";
 }

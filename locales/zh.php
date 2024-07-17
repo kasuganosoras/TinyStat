@@ -105,6 +105,7 @@ $locale['zh'] = [
     'notify.dingtalk.title' => '服务状态发生变化',
     'notify.dingtalk.content' => "## 服务状态发生变化\n\n**服务名称**：%s\n\n**当前状态**：%s\n\n**变更原因**：%s",
     'notify.wecom.content' => "## 服务状态发生变化\n\n**服务名称**：%s\n\n**当前状态**：%s\n\n**变更原因**：%s",
+    'notify.freemobile.content' => '服务 [%s] 状态发生变化，当前状态：%s，更新原因：%s',
     // frontend
     'frontend.editable.title' => '点击编辑',
 ];

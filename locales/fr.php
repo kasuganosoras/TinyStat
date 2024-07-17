@@ -106,6 +106,7 @@ $locale['fr'] = [
     'notify.dingtalk.title' => 'Status du service changé',
     'notify.dingtalk.content' => '## Status du service changé\n\n**Nom du service**: %s\n\n**État actuel**: %s\n\n**Raison**: %s',
     'notify.wecom.content' => '## Status du service changé\n\n**Nom du service**: %s\n\n**État actuel**: %s\n\n**Raison**: %s',
+    'notify.freemobile.content' => 'Status du service [%s] changé, état actuel: %s, raison: %s',
     // frontend
     'frontend.editable.title' => 'Cliquez pour modifier',
 ];
